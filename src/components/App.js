@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
 import logo from '../logo.png';
 import './App.css';
+import {create} from "ipfs-http-client";
+
+const ipfs = create("https://ipfs.infura.io:5001/api/v0");
 
 
 const App = () => {
 
-  const onSubmit = (event) => {
+  const [imageBuffer, setImage] = useState(null);
+
+  const onSubmit = async (event) => {
     event.preventDefault();
+
+    try {
+
+      const createdFile = await ipfs.add(imageBuffer);
+      const url = `https://ipfs.infura.io/ipfs/${createdFile.path}`;
+      console.log(url);
+
+    } catch (error) {
+      console.log(error);
+    }
   }
 
 
@@ -14,15 +29,12 @@ const App = () => {
     event.preventDefault();
     console.log("File captured");
 
-    const [imageBuffer, setImage] = useState(null);
-
     //process file
     const file = event.target.files[0];
     const reader = new window.FileReader();
     reader.readAsArrayBuffer(file);
     reader.onloadend = () => {
-      setImage(imageBuffer);
-      //console.log("buffer", Buffer(reader.result));
+      setImage(Buffer(reader.result));
     }
   }
 

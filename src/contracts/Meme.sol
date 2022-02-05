@@ -2,7 +2,7 @@ pragma solidity >=0.5.9;
 
 contract Meme {
     
-    string memeUrl = "https://ipfs.infura.io/ipfs/QmRtumqmm52d6rTEjyjupuuz2xVadUyT9ocRhWWB7TS3xB";
+    string memeUrl = "";
 
     //write
     function set(string memory _memeUrl) public{

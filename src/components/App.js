@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
-//import logo from '../logo.png';
+import logo from '../logo.png';
 import './App.css';
 import {create} from "ipfs-http-client";
 import Web3 from "web3";
 import MemeABI from "../abis/Meme.json"
 
+//get IPFS client
 const ipfs = create("https://ipfs.infura.io:5001/api/v0");
 
 
 const App = () => {
 
+  //check metamask account
+  //load only once
   useEffect(() => {
     loadWeb3();
   }, []);
 
   const [imageBuffer, setImageBuffer] = useState(null);
-  const [imageUrl, setImage] = useState("https://ipfs.infura.io/ipfs/QmRtumqmm52d6rTEjyjupuuz2xVadUyT9ocRhWWB7TS3xB");
+  const [imageUrl, setImage] = useState(logo);
   const [ethAccount, setEthAccount] = useState();
   const [contract, setContract] = useState(null);
 
@@ -38,13 +41,16 @@ const App = () => {
       console.log("Smart contract has been deployed on this network");
       const abi = MemeABI.abi;
       const address = networkData.address;
+      //get smart contract using ABI and contract address
       const contract = web3.eth.Contract(abi, address);
 
       setContract(contract);
       
       // get url from blockchain
       const memeUrl = await contract.methods.get().call();
-      console.log("memeurl:",memeUrl);
+      console.log("memeurl:", memeUrl);
+
+      //update image with URL returned by the smart contract
       setImage(memeUrl);
 
     } else {
@@ -63,7 +69,7 @@ const App = () => {
       //window.web3 = new Web3(window.web3.currentProvider);
       window.web3 = new Web3(window.web3.currentProvider);
     } else {
-      window.alert("Please use metamask!")
+      window.alert("Couldn't find Metamask!")
     }
   }
 
@@ -71,7 +77,7 @@ const App = () => {
     event.preventDefault();
 
     try {
-
+      //add image to IPFS
       const createdFile = await ipfs.add(imageBuffer);
       const url = `https://ipfs.infura.io/ipfs/${createdFile.path}`;
       console.log(url);
@@ -83,6 +89,7 @@ const App = () => {
         } else {
           console.log("new image set: ", txHash);
         }
+        //refresh the image with new one
         setImage(url);
       });
 
@@ -91,7 +98,7 @@ const App = () => {
     }
   }
 
-
+  //capture selected image by user and show on the screen
   const captureFile = (event) => {
     event.preventDefault();
     console.log("File captured");
@@ -100,7 +107,9 @@ const App = () => {
     const file = event.target.files[0];
     const reader = new window.FileReader();
     reader.readAsArrayBuffer(file);
+    //on loaded the image
     reader.onloadend = () => {
+      //set image
       setImageBuffer(Buffer(reader.result));
     }
   }
@@ -135,7 +144,5 @@ const App = () => {
     </div>
   );
 }
-
-
 
 export default App;

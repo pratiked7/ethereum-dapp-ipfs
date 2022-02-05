@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import logo from '../logo.png';
+//import logo from '../logo.png';
 import './App.css';
 import {create} from "ipfs-http-client";
 
@@ -8,7 +8,8 @@ const ipfs = create("https://ipfs.infura.io:5001/api/v0");
 
 const App = () => {
 
-  const [imageBuffer, setImage] = useState(null);
+  const [imageBuffer, setImageBuffer] = useState(null);
+  const [imageUrl, setImage] = useState("https://ipfs.infura.io/ipfs/QmRtumqmm52d6rTEjyjupuuz2xVadUyT9ocRhWWB7TS3xB");
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -18,6 +19,7 @@ const App = () => {
       const createdFile = await ipfs.add(imageBuffer);
       const url = `https://ipfs.infura.io/ipfs/${createdFile.path}`;
       console.log(url);
+      setImage(url);
 
     } catch (error) {
       console.log(error);
@@ -34,7 +36,7 @@ const App = () => {
     const reader = new window.FileReader();
     reader.readAsArrayBuffer(file);
     reader.onloadend = () => {
-      setImage(Buffer(reader.result));
+      setImageBuffer(Buffer(reader.result));
     }
   }
 
@@ -59,7 +61,7 @@ const App = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <img src={logo} className="App-logo" alt="logo" />
+                <img src={imageUrl} className="App-logo" alt="logo" />
               </a>
               <p>&nbsp;</p>
               <h2>Change Image</h2>
